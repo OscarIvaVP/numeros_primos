@@ -188,7 +188,6 @@ with st.form("formulario_primos"):
         min_value=-LIMITE,
         max_value=LIMITE,
         step=1,
-        value=st.session_state.numero,
         key="numero",
         help="Se aceptan enteros entre −1 000 000 000 000 y 1 000 000 000 000.",
     )
