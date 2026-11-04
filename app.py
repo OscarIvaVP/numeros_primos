@@ -40,15 +40,17 @@ def formato_factorizacion(factores: dict[int, int]) -> str:
     return " × ".join(partes)
 
 
-def obtener_divisores(n: int, max_limite: int = MAX_DIVISORES_MUESTRA) -> tuple[list[int], int]:
-    """Devuelve una muestra ordenada de divisores positivos y su cantidad total."""
-    divisores = set()
-    for candidato in range(1, math.isqrt(n) + 1):
-        if n % candidato == 0:
-            divisores.add(candidato)
-            divisores.add(n // candidato)
-    ordenados = sorted(divisores)
-    return ordenados[:max_limite], len(ordenados)
+def obtener_divisores(factores: dict[int, int], max_limite: int = MAX_DIVISORES_MUESTRA) -> tuple[list[int], int]:
+    """Genera los divisores desde la factorización, sin volver a probar hasta √n."""
+    divisores = [1]
+    for factor, exponente in factores.items():
+        anteriores = divisores[:]
+        potencia = 1
+        for _ in range(exponente):
+            potencia *= factor
+            divisores.extend(valor * potencia for valor in anteriores)
+    divisores.sort()
+    return divisores[:max_limite], len(divisores)
 
 
 def analizar_primalidad(n: int) -> dict:
@@ -102,9 +104,9 @@ def analizar_primalidad(n: int) -> dict:
     else:
         raiz = math.isqrt(n)
         raiz_aprox = math.sqrt(n)
-        divisor = next((d for d in range(2, raiz + 1) if n % d == 0), None)
         factores = factorizar_numero(n)
-        muestra, total = obtener_divisores(n)
+        divisor = min(factores) if sum(factores.values()) > 1 else None
+        muestra, total = obtener_divisores(factores)
         factorizacion = formato_factorizacion(factores)
         if divisor is not None:
             cociente = n // divisor
